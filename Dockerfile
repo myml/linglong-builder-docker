@@ -8,4 +8,3 @@ RUN apt-get install -y --no-install-recommends linglong-builder
 RUN mkdir /run/ll-box && chmod 777 /run/ll-box
 RUN useradd --create-home --no-log-init --shell /bin/bash builder
 USER builder
-VOLUME /home/builder/.cache/linglong-builder
