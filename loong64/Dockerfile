@@ -5,6 +5,9 @@ RUN echo "deb [trusted=yes] https://ci.deepin.com/repo/obs/linglong:/CI:/release
 RUN apt update
 RUN apt-get install -y --no-install-recommends linglong-bin
 RUN apt-get install -y --no-install-recommends linglong-builder
+# Fix Error: linglong-builder depend wget
+RUN apt-get install -y wget
+
 RUN mkdir /run/ll-box && chmod 777 /run/ll-box
 # fix Error: filesystem error: cannot create directories: Permission denied [/run/user/0/linglong/box]
 RUN mkdir /run/user/1000 && chown 1000:1000 /run/user/1000 && chmod 700 /run/user/1000
