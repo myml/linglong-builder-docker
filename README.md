@@ -6,5 +6,7 @@
 ## 镜像列表
 
 registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.10.3_amd64
+
 registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.10.3_arm64
+
 registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.10.3_loong64
