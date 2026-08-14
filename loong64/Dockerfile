@@ -13,6 +13,10 @@ RUN mkdir /run/ll-box && chmod 777 /run/ll-box
 RUN mkdir -m 700 -p /run/user/1000 && chown 1000:1000 /run/user/1000
 RUN useradd --create-home --no-log-init --shell /bin/bash builder
 
+# fix Error: newuidmap: write to uid_map failed: Operation not permitted
+RUN echo 0 0 65535 > /etc/subuid
+RUN echo 0 0 65535 > /etc/subgid
+
 ENV XDG_RUNTIME_DIR /run/user/1000
 USER builder
 WORKDIR /home/builder
