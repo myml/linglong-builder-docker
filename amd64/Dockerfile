@@ -1,4 +1,4 @@
-FROM hub.cicd.getdeepin.org/debian:trixie
+FROM hub.cicd.getdeepin.org/library/debian:trixie
 RUN sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list.d/debian.sources
 RUN apt update && apt-get install -y ca-certificates
 RUN echo "deb [trusted=yes] https://ci.deepin.com/repo/obs/linglong:/CI:/release/Debian_13/ ./" | tee /etc/apt/sources.list.d/linglong.list
