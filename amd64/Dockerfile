@@ -9,8 +9,6 @@ RUN apt-get install -y --no-install-recommends linglong-builder
 RUN apt-get install -y wget
 
 RUN mkdir /run/ll-box && chmod 777 /run/ll-box
-# fix Error: filesystem error: cannot create directories: Permission denied [/run/user/0/linglong/box]
-RUN mkdir -m 700 -p /run/user/1000 && chown 1000:1000 /run/user/1000
 RUN useradd --create-home --no-log-init --shell /bin/bash builder
 
 # fix Error: newuidmap: write to uid_map failed: Operation not permitted
@@ -22,6 +20,9 @@ RUN apt-get install -y openjdk-21-jre
 ADD https://jenkins.linyaps.org.cn/jnlpJars/agent.jar /
 RUN chmod 444 /agent.jar
 
+# fix Error: OverlayFS mount failed at /run/user/1000
 ENV XDG_RUNTIME_DIR /run/user/1000
+VOLUME ["/run/user/1000"]
 USER builder
 WORKDIR /home/builder
+VOLUME ["/home/builder"]
