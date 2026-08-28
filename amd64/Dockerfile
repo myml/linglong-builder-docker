@@ -19,6 +19,9 @@ RUN chmod 444 /agent.jar
 # fix Error: OverlayFS mount failed at /run/user/1000
 ENV XDG_RUNTIME_DIR /run/user/1000
 RUN mkdir -p /run/user/1000
+RUN chown builder:builder /run/user/1000
 VOLUME ["/run/user/1000"]
+
 WORKDIR /home/builder
 VOLUME ["/home/builder"]
+USER builder
