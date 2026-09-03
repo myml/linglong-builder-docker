@@ -38,4 +38,10 @@ RUN wget -q -O /tmp/multica.tar.gz \
     && tar -xzf /tmp/multica.tar.gz -C /tmp multica \
     && install -m 0755 /tmp/multica /usr/local/bin/multica \
     && rm -f /tmp/multica.tar.gz
+
+RUN wget -q -O /tmp/codex.tar.gz \
+      "https://gh-proxy.com/https://github.com/openai/codex/releases/download/rust-v0.153.0/codex-x86_64-unknown-linux-musl.tar.gz" \
+    && tar -xzf /tmp/codex.tar.gz -C /tmp \
+    && install -m 0755 /tmp/codex-x86_64-unknown-linux-musl /usr/local/bin/codex \
+    && rm -f /tmp/codex.tar.gz
 USER builder
