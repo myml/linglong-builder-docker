@@ -29,3 +29,13 @@ RUN apt-get install -y openjdk-21-jre
 ADD https://jenkins.linyaps.org.cn/jnlpJars/agent.jar /
 RUN chmod 444 /agent.jar
 USER builder
+
+# multica CLI image
+FROM base AS multica
+USER root
+RUN wget -q -O /tmp/multica.tar.gz \
+      "https://gh-proxy.com/https://github.com/multica-ai/multica/releases/download/v0.4.38/multica-cli-0.4.38-linux-amd64.tar.gz" \
+    && tar -xzf /tmp/multica.tar.gz -C /tmp multica \
+    && install -m 0755 /tmp/multica /usr/local/bin/multica \
+    && rm -f /tmp/multica.tar.gz
+USER builder
