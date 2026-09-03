@@ -1,4 +1,4 @@
-FROM hub.cicd.getdeepin.org/library/debian:trixie
+FROM hub.cicd.getdeepin.org/library/debian:trixie AS base
 RUN sed -i 's/deb.debian.org/mirrors.tuna.tsinghua.edu.cn/g' /etc/apt/sources.list.d/debian.sources
 ADD https://mirrors.tuna.tsinghua.edu.cn/debian/dists/trixie/InRelease /tmp/InRelease
 RUN apt update && apt-get install -y ca-certificates
@@ -20,4 +20,12 @@ VOLUME ["/run/user/1000"]
 
 WORKDIR /home/builder
 VOLUME ["/home/builder"]
+USER builder
+
+# jenkins agent image
+FROM base AS jenkins
+USER root
+RUN apt-get install -y openjdk-21-jre
+ADD https://jenkins.linyaps.org.cn/jnlpJars/agent.jar /
+RUN chmod 444 /agent.jar
 USER builder
