@@ -43,7 +43,7 @@ RUN wget --progress=dot:mega -O /tmp/multica.tar.gz \
     && tar -xzf /tmp/multica.tar.gz -C /tmp multica \
     && install -m 0755 /tmp/multica /usr/local/bin/multica \
     && rm -f /tmp/multica.tar.gz
-RUN apt-get install -y --no-install-recommends sudo curl \
- && echo 'builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder \
+RUN apt-get install -y --no-install-recommends sudo curl 
+RUN echo 'builder ALL=(ALL) NOPASSWD: ALL' > /etc/sudoers.d/builder \
  && chmod 440 /etc/sudoers.d/builder
 USER builder

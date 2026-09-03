@@ -18,11 +18,18 @@ host默认的subuid 1000:100000:65536，最大的uid是1065535无法满足条件
 
 ## 镜像列表
 
+除了基础的镜像，还提供了包含jenkins agent和multica runtime的镜像
+
 registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_amd64
+registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_amd64_jenkins
+registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_amd64_multica
 
 registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_arm64
+registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_arm64_jenkins
+registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_arm64_multica
 
 registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_loong64
+registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_loong64_jenkins
 
 registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.10.3_amd64
 
