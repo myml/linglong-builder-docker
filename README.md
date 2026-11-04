@@ -115,7 +115,11 @@ registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_loong64_jenkins
 ./scripts/smoke.sh registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_amd64
 ```
 
-> 各架构的 base 镜像不同：amd64 / arm64 用 `hub.cicd.getdeepin.org/library/debian:trixie`，loong64 用 `ghcr.cicd.getdeepin.org/loong64/debian:sid`（龙芯移植版）。两个 registry 仅内网可达，所以镜像构建要在内网机器上做。
+> 默认全部走公网源，不需要内网环境：
+> - base 镜像：amd64 / arm64 用 `docker.1ms.run/library/debian:trixie`（毫秒镜像代理 docker hub），loong64 用 `ghcr.1ms.run/loong64/debian:sid`（龙芯移植版）
+> - debian apt 源：`mirrors.ustc.edu.cn`（中科大）
+>
+> 内网环境可以用 `--build-arg BASE_IMAGE=... --build-arg DEBIAN_MIRROR=... ` 换回私有源，`scripts/build.sh` 里对应改 `base` / `codename` 变量即可。
 
 ## jenkins 使用案例
 

@@ -3,31 +3,31 @@
 # 多架构统一构建入口（替代原先 amd64/arm64/loong64 三份重复的 Dockerfile）。
 #
 #   # amd64 / arm64（base 是同一份多架构 debian:trixie 清单）
-#   podman build --target base --build-arg BASE_IMAGE=hub.cicd.getdeepin.org/library/debian:trixie \
-#                -t registry.cn-hangzhou.aliyuncs.com/linyaps/builder:dev_amd64 .
+#   podman build --target base -t registry.cn-hangzhou.aliyuncs.com/linyaps/builder:dev_amd64 .
 #
-#   # loong64（debian sid 的龙芯移植）
+#   # loong64（debian sid 的龙芯移植，走 ghcr 的 1ms 代理）
 #   podman build --target base \
-#                --build-arg BASE_IMAGE=ghcr.cicd.getdeepin.org/loong64/debian:sid \
-#                --build-arg DEBIAN_CODENAME=sid \
+#                --build-arg BASE_IMAGE=ghcr.1ms.run/loong64/debian:sid \
 #                -t registry.cn-hangzhou.aliyuncs.com/linyaps/builder:dev_loong64 .
 #
 #   # jenkins / multica 变体：加 --target jenkins 或 --target multica
-#   # 多架构：交给 buildx / GitHub Actions（见 .github/workflows/build.yml），会自动注入 TARGETARCH
+#   # 多架构：多架构构建时 TARGETARCH 由 buildx 注入，podman 下手动传 --build-arg TARGETARCH=arm64
 #
 # 版本号写进 TAG：<linglong 版本>_<arch>，例如 1.13.8_loong64。
 
-ARG BASE_IMAGE=hub.cicd.getdeepin.org/library/debian:trixie
-# debian 的 codename，用于给 InRelease 预取路径拼 URL（trixie / sid）
-ARG DEBIAN_CODENAME=trixie
+# 默认走公网：docker hub 用毫秒镜像（docker.1ms.run），debian 源用中科大。
+# 内网环境可以用 --build-arg 换回私有 registry / 内网源。
+ARG BASE_IMAGE=docker.1ms.run/library/debian:trixie
+# debian apt 源，默认中科大
+ARG DEBIAN_MIRROR=mirrors.ustc.edu.cn
 
 FROM ${BASE_IMAGE} AS base
-ARG DEBIAN_CODENAME
+ARG DEBIAN_MIRROR
 
-# 基础镜像默认走公网 debian 源，这里换成内网镜像；InRelease 预取一次，
-# 让 DNS / 证书问题在构建早期就暴露，而不是卡在 apt-get update 里
-RUN sed -i 's/deb.debian.org/mirrors.cicd.getdeepin.org/g' /etc/apt/sources.list.d/debian.sources
-ADD https://mirrors.cicd.getdeepin.org/debian/dists/${DEBIAN_CODENAME}/InRelease /tmp/InRelease
+# 基础镜像默认走 deb.debian.org，这里换成指定镜像站
+# （原来这里还有一条 ADD .../InRelease 做"预取探测"，但 Go 的默认 UA 会被部分镜像站 403，
+#   换成 RUN 又得先装 curl，性价比太低；apt-get update 本身就会在连不通时明确报错）
+RUN sed -i "s|deb.debian.org|${DEBIAN_MIRROR}|g" /etc/apt/sources.list.d/debian.sources
 
 RUN apt-get update \
  && apt-get install -y --no-install-recommends ca-certificates
