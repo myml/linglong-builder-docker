@@ -47,6 +47,7 @@ podman run --rm -ti --privileged \
 - **`--userns=keep-id:uid=1000,gid=1000`**：把容器里的 `builder(1000)` 映射成**你**。裸写 `--userns=keep-id` 只是“保留调用者 uid”，当宿主 uid 不是 1000 时（例如 1002），容器里的 `builder` 反而落到 subuid 上，工程目录读写不了，构建报 `Build failed: [code 1]: stage build error`（日志里往往只有一句误导性的 `unknown argument ignored: lazytime`）。
 - **缓存卷必须在这个映射下新建**。换过映射的旧卷里文件属主对不上，会报 `failed to check build config … Permission denied`；`podman volume rm` 重建即可（纯缓存，删了只是下次要重新下载 base）。
 - **`--privileged` 不能省**，原因见下文。
+- SELinux 系统（Fedora / CentOS 等）上 bind mount 要加 `:z`，或直接 `--security-opt label=disable`，否则容器里可能读不到工程目录。
 - 1.13.8 及更早的镜像还需要加 `--tmpfs /run/user/1000:rw,mode=1777,size=64m`：这些镜像把 `XDG_RUNTIME_DIR` 放在 root 所有的卷里，`builder` 写不进去会报 `stage runtime check error`。本仓库新构建的镜像已把 `XDG_RUNTIME_DIR` 改到 `/home/builder/.run`，不再需要这个参数。
 
 ## 为什么需要 165536 个 subuid
@@ -97,6 +98,24 @@ registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_arm64_multica
 registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_loong64
 registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_loong64_jenkins
 ```
+
+## 构建镜像
+
+仓库根目录的 `Dockerfile` 是多架构统一入口，架构差异全部通过 `--build-arg` 表达（`BASE_IMAGE` / `DEBIAN_CODENAME`），不再维护三份重复的 Dockerfile。用脚本构建：
+
+```bash
+./scripts/build.sh amd64 1.13.8                  # base + jenkins + multica 三个变体
+./scripts/build.sh loong64 1.13.8 --variant base # 只构建 base
+./scripts/build.sh arm64 1.13.8 --push           # 构建完推送
+```
+
+构建完用 smoke 脚本验证一下（在容器里跑一次最小构建，覆盖 uid 映射、fuse、内层沙箱、`buildext.apt`）：
+
+```bash
+./scripts/smoke.sh registry.cn-hangzhou.aliyuncs.com/linyaps/builder:1.13.8_amd64
+```
+
+> 各架构的 base 镜像不同：amd64 / arm64 用 `hub.cicd.getdeepin.org/library/debian:trixie`，loong64 用 `ghcr.cicd.getdeepin.org/loong64/debian:sid`（龙芯移植版）。两个 registry 仅内网可达，所以镜像构建要在内网机器上做。
 
 ## jenkins 使用案例
 
