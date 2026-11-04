@@ -9,6 +9,7 @@
 #   ./scripts/build.sh arm64 1.13.8 --push          # 构建完推到镜像仓库
 #
 # 环境变量：REGISTRY / IMAGE / ENGINE（默认自动探测 podman、docker）。
+# 默认用公网源：docker hub 走毫秒镜像 docker.1ms.run，debian apt 走中科大 mirrors.ustc.edu.cn。
 set -euo pipefail
 
 ROOT=$(cd "$(dirname "$0")/.." && pwd)
@@ -39,11 +40,9 @@ done
 
 case "$arch" in
   amd64|arm64)
-    base=hub.cicd.getdeepin.org/library/debian:trixie
-    codename=trixie ;;
+    base=docker.1ms.run/library/debian:trixie ;;
   loong64)
-    base=ghcr.cicd.getdeepin.org/loong64/debian:sid
-    codename=sid ;;
+    base=ghcr.1ms.run/loong64/debian:sid ;;
   *)
     echo "不支持的架构: $arch（可选 amd64 / arm64 / loong64）" >&2
     exit 2 ;;
@@ -59,7 +58,6 @@ for v in $variants; do
     --target "$v" \
     --platform "linux/$arch" \
     --build-arg BASE_IMAGE="$base" \
-    --build-arg DEBIAN_CODENAME="$codename" \
     -t "$REGISTRY/$IMAGE:$tag" \
     "$ROOT"
 done
